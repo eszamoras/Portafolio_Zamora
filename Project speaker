@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Esteban Zamora — Speaker Recognition System</title>
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="project-detail.css">
+</head>
+<body>
+<div class="bg-art"><div class="orb orb-1"></div><div class="orb orb-2"></div><div class="orb orb-3"></div></div>
+<div class="progress-bar" id="progressBar"></div>
+<nav>
+  <a class="nav-logo" href="index.html">EZ.DEV</a>
+  <div class="nav-links">
+    <a href="about.html">About</a>
+    <a href="index.html" class="active">Work</a>
+    <a href="resume.pdf" target="_blank">Résumé</a>
+    <a href="https://github.com/esteban-zamora" target="_blank" class="nav-cta">GitHub ↗</a>
+  </div>
+</nav>
+<div class="detail-hero">
+  <div class="detail-hero-bg card-v5">
+    <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:120px;opacity:0.18;filter:drop-shadow(0 0 60px #7dd3b0)">🎙️</div>
+    <div style="position:absolute;inset:0;opacity:0.05;background-image:linear-gradient(rgba(255,255,255,.5)1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.5)1px,transparent 1px);background-size:48px 48px;"></div>
+  </div>
+  <div class="detail-hero-overlay"></div>
+  <a class="detail-back" href="index.html">← All Projects</a>
+  <div class="detail-hero-content">
+    <div class="detail-eyebrow">Fall 2025 – Spring 2026 · Complete</div>
+    <h1 class="detail-title">Speaker Recognition System</h1>
+    <div class="detail-tags"><span class="detail-tag">MATLAB</span><span class="detail-tag">DSP</span><span class="detail-tag">Signal Processing</span><span class="detail-tag">Spectrogram</span><span class="detail-tag">Pattern Recognition</span></div>
+  </div>
+</div>
+<div class="detail-body">
+  <div class="detail-grid">
+    <div class="detail-section full ab">
+      <div class="slabel">◎ Overview</div>
+      <p class="stext" style="font-size:16px;line-height:1.9;">A speaker identification system built in MATLAB using magnitude spectrogram features and minimum-distance scoring. Achieved 100% identification accuracy across 61 test recordings with 16 enrolled speakers.</p>
+    </div>
+  </div>
+  <div style="margin-top:2px;" class="detail-grid">
+    <div class="detail-section ab2">
+      <div class="slabel">⊙ System Objective</div>
+      <p class="stext">Design a text-independent speaker identification pipeline in MATLAB that extracts spectrogram features from training recordings, builds per-speaker databases, and classifies unknown speakers by minimum-distance scoring against all enrolled databases.</p>
+    </div>
+    <div class="detail-section">
+      <div class="slabel">⊘ Design Constraints</div>
+      <div class="spec-list"><div class="spec-item">Feature extraction must be robust to volume differences — column-wise unit-norm normalization required</div><div class="spec-item">DC component must be removed before windowing to prevent low-frequency bias in the spectrogram</div><div class="spec-item">Hamming window of 20 ms with 50% overlap must be consistently applied across all recordings</div><div class="spec-item">Scoring formula: score = sum(min(sqrt(2 - 2*X'*U))) / size(U,2) — must be vectorized for speed</div><div class="spec-item">Output must be automatically saved to uniquely named Excel files per run for reproducibility</div></div>
+    </div>
+  </div>
+  <div style="margin-top:2px;">
+    <div class="detail-section full">
+      <div class="slabel">⊞ System Architecture</div>
+      <div class="arch-diagram">┌──────────────────────────────────────────────────────┐
+│        SPEAKER RECOGNITION PIPELINE                   │
+├──────────────────────────────────────────────────────┤
+│                                                       │
+│  TRAINING PHASE (recordings 1–3 per speaker)         │
+│   <span class="ah">[Audio File]</span> <span class="ah2">──►</span> Remove DC <span class="ah2">──►</span> Hamming Window(20ms)│
+│               <span class="ah2">──►</span> Magnitude Spectrogram               │
+│               <span class="ah2">──►</span> Column Normalize (unit norm)        │
+│               <span class="ah2">──►</span> Concatenate 3 recordings → DB       │
+│               <span class="ah2">──►</span> Save .mat database file             │
+│                                                       │
+│  IDENTIFICATION PHASE (remaining recordings)         │
+│   <span class="ah">[Unknown Audio]</span> <span class="ah2">──►</span> Same preprocessing pipeline    │
+│               <span class="ah2">──►</span> Score against ALL speaker DBs       │
+│               <span class="ah2">──►</span> score = sum(min(√(2−2·X'·U)))/N    │
+│               <span class="ah2">──►</span> Argmin score → Predicted Speaker    │
+│                                                       │
+│  EVALUATION                                          │
+│   Confusion Matrix + Excel Score Sheet               │
+│                                                       │
+└──────────────────────────────────────────────────────┘</div>
+    </div>
+  </div>
+  <div style="margin-top:2px;" class="detail-grid">
+    <div class="detail-section ab3">
+      <div class="slabel">⊛ Software Architecture</div>
+      <p class="stext">The MATLAB pipeline consists of two phases. In training, the first three recordings per speaker have their DC mean subtracted, then a short-time magnitude spectrogram is computed using a 20 ms Hamming window at 50% overlap. Each spectrogram column is normalized to unit L2-norm to remove gain variation. The three matrices are concatenated and saved as a .mat speaker database. In identification, remaining recordings are processed through the identical pipeline. Each unknown matrix U is scored against every database X using score = sum(min(sqrt(2 - 2*X'*U))) / size(U,2) — the mean of per-frame minimum cosine distances. The lowest score is the predicted speaker. All scores and predictions are written to a uniquely named Excel file and a confusion matrix is generated.</p>
+    </div>
+    <div class="detail-section abg">
+      <div class="slabel">◈ Correctness &amp; Validation</div>
+      <p class="stext">This is a batch offline DSP system, not a real-time control system. The pipeline is fully deterministic given fixed recordings: the same input always produces the same score and prediction. Processing time is bounded by recording length and speaker count. No random state, no order-dependent behavior.</p>
+    </div>
+  </div>
+  <div style="margin-top:2px;">
+    <div class="detail-section full">
+      <div class="slabel">◑ Key Metrics</div>
+      <div class="metric-grid"><div class="metric-card">
+      <div class="metric-val">100</div>
+      <div class="metric-unit">%</div>
+      <div class="metric-desc">Identification Accuracy</div>
+    </div><div class="metric-card">
+      <div class="metric-val">61</div>
+      <div class="metric-unit">recordings</div>
+      <div class="metric-desc">Test Set Size</div>
+    </div><div class="metric-card">
+      <div class="metric-val">16</div>
+      <div class="metric-unit">speakers</div>
+      <div class="metric-desc">Enrolled Identities</div>
+    </div></div>
+    </div>
+  </div>
+</div>
+<script>
+window.addEventListener('scroll',()=>{
+  const p=document.getElementById('progressBar');
+  p.style.width=Math.min((window.scrollY/(document.body.scrollHeight-window.innerHeight))*100,100)+'%';
+});
+</script>
+</body>
+</html>

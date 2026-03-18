@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Esteban Zamora — Multi-Precision Arithmetic Engine</title>
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="project-detail.css">
+</head>
+<body>
+<div class="bg-art"><div class="orb orb-1"></div><div class="orb orb-2"></div><div class="orb orb-3"></div></div>
+<div class="progress-bar" id="progressBar"></div>
+<nav>
+  <a class="nav-logo" href="index.html">EZ.DEV</a>
+  <div class="nav-links">
+    <a href="about.html">About</a>
+    <a href="index.html" class="active">Work</a>
+    <a href="resume.pdf" target="_blank">Résumé</a>
+    <a href="https://github.com/esteban-zamora" target="_blank" class="nav-cta">GitHub ↗</a>
+  </div>
+</nav>
+<div class="detail-hero">
+  <div class="detail-hero-bg card-v3">
+    <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:120px;opacity:0.18;filter:drop-shadow(0 0 60px #818cf8)">⚙️</div>
+    <div style="position:absolute;inset:0;opacity:0.05;background-image:linear-gradient(rgba(255,255,255,.5)1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.5)1px,transparent 1px);background-size:48px 48px;"></div>
+  </div>
+  <div class="detail-hero-overlay"></div>
+  <a class="detail-back" href="index.html">← All Projects</a>
+  <div class="detail-hero-content">
+    <div class="detail-eyebrow">Fall 2025 · Complete</div>
+    <h1 class="detail-title">Multi-Precision Arithmetic Engine</h1>
+    <div class="detail-tags"><span class="detail-tag">AVR Assembly</span><span class="detail-tag">ATmega328P</span><span class="detail-tag">Microchip Studio</span><span class="detail-tag">Stack Calling Convention</span></div>
+  </div>
+</div>
+<div class="detail-body">
+  <div class="detail-grid">
+    <div class="detail-section full ab">
+      <div class="slabel">◎ Overview</div>
+      <p class="stext" style="font-size:16px;line-height:1.9;">Hand-written AVR assembly implementation of 32-bit addition, subtraction, and 32×32-to-64-bit multiplication on the ATmega328P. Uses a stack-based calling convention with full carry propagation across all byte lanes.</p>
+    </div>
+  </div>
+  <div style="margin-top:2px;" class="detail-grid">
+    <div class="detail-section ab2">
+      <div class="slabel">⊙ System Objective</div>
+      <p class="stext">Implement multi-precision arithmetic routines (32-bit add/sub and 32×32→64-bit multiply) in pure AVR assembly with a rigorously defined stack-based parameter passing and return convention, and validate correctness against boundary-condition test vectors.</p>
+    </div>
+    <div class="detail-section">
+      <div class="slabel">⊘ Design Constraints</div>
+      <div class="spec-list"><div class="spec-item">No C runtime — all parameter passing and return values via the hardware stack</div><div class="spec-item">Carry must propagate correctly across all 4 byte lanes for addition and subtraction</div><div class="spec-item">Two's complement subtraction must be implemented without a native SUB instruction spanning multiple bytes</div><div class="spec-item">32×32 multiplication must produce a full 64-bit result using only 8-bit MUL instructions</div><div class="spec-item">Partial products must be accumulated with correct positional shifting (spacer bytes) and carry handling</div></div>
+    </div>
+  </div>
+  <div style="margin-top:2px;">
+    <div class="detail-section full">
+      <div class="slabel">⊞ System Architecture</div>
+      <div class="arch-diagram">┌──────────────────────────────────────────────────────┐
+│        AVR ARITHMETIC ENGINE STRUCTURE                │
+├──────────────────────────────────────────────────────┤
+│                                                       │
+│  SRAM Layout (0x0100+)                                │
+│   <span class="ah">[Num A: 4 bytes]</span> <span class="ah">[Num B: 4 bytes]</span>                   │
+│   <span class="ah">[result: 4 bytes]</span> <span class="ah">[resultMult: 8 bytes]</span>             │
+│                                                       │
+│  Subroutine Call Convention                           │
+│   Caller pushes pairs (ByteN_A, ByteN_B) LSB→MSB     │
+│   Callee computes result and pushes to stack          │
+│   Caller pops 4-byte result (add) or 8-byte (mul)     │
+│                                                       │
+│  add32Bit:  4-pair pop loop + carry propagation       │
+│  subProg:   two's complement → addProg                │
+│  multProg:  16× MUL + partial product accumulation   │
+│                                                       │
+└──────────────────────────────────────────────────────┘</div>
+    </div>
+  </div>
+  <div style="margin-top:2px;" class="detail-grid">
+    <div class="detail-section ab3">
+      <div class="slabel">⊛ Firmware Architecture</div>
+      <p class="stext">The add32Bit subroutine pops four byte-pairs from the stack in LSB-first order. For each pair, if a carry was set by the previous addition it is added to the current byte before the lane addition, propagating the carry chain. The result is stored MSB-first into SRAM then pushed back to the stack. The subProg routine computes two's complement of operand B (bitwise NOT + add-1 with SEC) then falls through to addProg. The multProg outer loop iterates over the 4 bytes of the multiplier; for each, the inner loop multiplies all 4 bytes of the multiplicand using MUL, producing 2-byte partial products. These plus required spacer bytes are accumulated into the 8-byte resultMult region with carry propagation, then reversed to little-endian order.</p>
+    </div>
+    <div class="detail-section abg">
+      <div class="slabel">◈ Determinism &amp; Hard Real-Time Guarantees</div>
+      <p class="stext">All routines execute in deterministic cycle-counts since no branches depend on data values except carry flags (which add one instruction cycle per propagation step). The worst-case multiply requires 16 MUL operations plus 16 addToMultResult calls, each with a bounded loop count. No dynamic memory allocation, no interrupts, no hardware timers — execution time is fully statically analyzable from the instruction sequence.</p>
+    </div>
+  </div>
+  <div style="margin-top:2px;">
+    <div class="detail-section full">
+      <div class="slabel">◑ Key Metrics</div>
+      <div class="metric-grid"><div class="metric-card">
+      <div class="metric-val">64</div>
+      <div class="metric-unit">bit result</div>
+      <div class="metric-desc">32×32 Multiply Output</div>
+    </div><div class="metric-card">
+      <div class="metric-val">0</div>
+      <div class="metric-unit">dynamic alloc</div>
+      <div class="metric-desc">Pure Stack Architecture</div>
+    </div><div class="metric-card">
+      <div class="metric-val">16</div>
+      <div class="metric-unit">MUL ops</div>
+      <div class="metric-desc">Full 32×32 Coverage</div>
+    </div></div>
+    </div>
+  </div>
+</div>
+<script>
+window.addEventListener('scroll',()=>{
+  const p=document.getElementById('progressBar');
+  p.style.width=Math.min((window.scrollY/(document.body.scrollHeight-window.innerHeight))*100,100)+'%';
+});
+</script>
+</body>
+</html>

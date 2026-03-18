@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Esteban Zamora — 14-Body Gravitational Simulation</title>
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="project-detail.css">
+</head>
+<body>
+<div class="bg-art"><div class="orb orb-1"></div><div class="orb orb-2"></div><div class="orb orb-3"></div></div>
+<div class="progress-bar" id="progressBar"></div>
+<nav>
+  <a class="nav-logo" href="index.html">EZ.DEV</a>
+  <div class="nav-links">
+    <a href="about.html">About</a>
+    <a href="index.html" class="active">Work</a>
+    <a href="resume.pdf" target="_blank">Résumé</a>
+    <a href="https://github.com/esteban-zamora" target="_blank" class="nav-cta">GitHub ↗</a>
+  </div>
+</nav>
+<div class="detail-hero">
+  <div class="detail-hero-bg card-v7">
+    <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:120px;opacity:0.18;filter:drop-shadow(0 0 60px #c9a84c)">🪐</div>
+    <div style="position:absolute;inset:0;opacity:0.05;background-image:linear-gradient(rgba(255,255,255,.5)1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.5)1px,transparent 1px);background-size:48px 48px;"></div>
+  </div>
+  <div class="detail-hero-overlay"></div>
+  <a class="detail-back" href="index.html">← All Projects</a>
+  <div class="detail-hero-content">
+    <div class="detail-eyebrow">Fall 2025 · Complete</div>
+    <h1 class="detail-title">14-Body Gravitational Simulation</h1>
+    <div class="detail-tags"><span class="detail-tag">C++</span><span class="detail-tag">OOP</span><span class="detail-tag">Design Patterns</span><span class="detail-tag">CI/CD</span><span class="detail-tag">Git</span><span class="detail-tag">clang-format</span></div>
+  </div>
+</div>
+<div class="detail-body">
+  <div class="detail-grid">
+    <div class="detail-section full ab">
+      <div class="slabel">◎ Overview</div>
+      <p class="stext" style="font-size:16px;line-height:1.9;">A 14-body solar system simulation in C++ applying Singleton, Visitor, Factory, and Prototype design patterns. Earth's full year-long orbit is reproduced with less than 1,000 km positional error over 31.5 million time steps, validated by a 5-test automated suite with CI enforcement.</p>
+    </div>
+  </div>
+  <div style="margin-top:2px;" class="detail-grid">
+    <div class="detail-section ab2">
+      <div class="slabel">⊙ System Objective</div>
+      <p class="stext">Implement a physically accurate N-body gravitational simulation of the solar system in modern C++ using canonical software design patterns. Validate correctness through a rigorous automated test suite and enforce code quality via CI/CD pipelines.</p>
+    </div>
+    <div class="detail-section">
+      <div class="slabel">⊘ Design Constraints</div>
+      <div class="spec-list"><div class="spec-item">Singleton pattern must ensure exactly one PhysicsEngine instance exists across the application lifetime</div><div class="spec-item">Factory pattern must instantiate all 14 bodies (Sun + 8 planets + 5 dwarf/notable bodies) from a configuration source</div><div class="spec-item">Visitor pattern must allow extensible per-body operations without modifying body classes</div><div class="spec-item">Prototype pattern must support deep-copy body instantiation for scenario branching</div><div class="spec-item">Earth's orbital position must stay within 1,000 km of reference ephemeris at every 100-second interval</div><div class="spec-item">All commits must pass clang-format linting; CI must reject non-conforming code</div></div>
+    </div>
+  </div>
+  <div style="margin-top:2px;">
+    <div class="detail-section full">
+      <div class="slabel">⊞ System Architecture</div>
+      <div class="arch-diagram">┌──────────────────────────────────────────────────────┐
+│      GRAVITATIONAL SIMULATION ARCHITECTURE            │
+├──────────────────────────────────────────────────────┤
+│                                                       │
+│  Design Pattern Layer                                 │
+│   <span class="ah">[Singleton]</span>:  PhysicsEngine (one global integrator) │
+│   <span class="ah">[Factory]</span>:    BodyFactory → CelestialBody instances │
+│   <span class="ah">[Visitor]</span>:    ForceVisitor, PrintVisitor, etc.      │
+│   <span class="ah">[Prototype]</span>:  CelestialBody::clone() deep copy      │
+│                                                       │
+│  Physics Engine                                       │
+│   for each timestep (Δt = 1s):                        │
+│    ├─ Compute pairwise gravitational forces           │
+│    │   F = G·m₁·m₂/r²  (all 14×13/2 pairs)          │
+│    ├─ Integrate accelerations <span class="ah2">──►</span> velocities          │
+│    └─ Integrate velocities <span class="ah2">──►</span> positions              │
+│                                                       │
+│  Validation                                           │
+│   5-test suite: grav force, Newton inertia,           │
+│   factory validation, full solar system, free body   │
+│   CI: clang-format + automated test pass             │
+│                                                       │
+└──────────────────────────────────────────────────────┘</div>
+    </div>
+  </div>
+  <div style="margin-top:2px;" class="detail-grid">
+    <div class="detail-section ab3">
+      <div class="slabel">⊛ Software Architecture</div>
+      <p class="stext">The C++ architecture centers on a PhysicsEngine Singleton owning the simulation loop. A BodyFactory reads initial conditions (position, velocity, mass) and constructs CelestialBody objects. Each time step the engine iterates all body pairs, computes the Newtonian force vector F = G·m₁·m₂/r³ · (r₂−r₁), and accumulates it onto both bodies (Newton's third law). Forces integrate into velocities (v += F/m · Δt) and velocities into positions (x += v · Δt) via symplectic Euler. The Visitor pattern applies post-step operations (energy logging, position output) per-body without coupling to the Body class. Prototype's clone() snapshots state for test comparison.</p>
+    </div>
+    <div class="detail-section abg">
+      <div class="slabel">◈ Correctness &amp; Validation</div>
+      <p class="stext">The simulation is deterministic by design — given fixed initial conditions and a fixed timestep, the same trajectory is always produced. IEEE 754 double-precision floating point ensures reproducible results across platforms. The 1-second timestep over 31.5 million steps (≈1 year) was selected to balance integration error against execution time, achieving sub-1,000 km positional accuracy for Earth's orbit.</p>
+    </div>
+  </div>
+  <div style="margin-top:2px;">
+    <div class="detail-section full">
+      <div class="slabel">◑ Key Metrics</div>
+      <div class="metric-grid"><div class="metric-card">
+      <div class="metric-val">&lt;1000</div>
+      <div class="metric-unit">km error</div>
+      <div class="metric-desc">Earth Orbit Accuracy</div>
+    </div><div class="metric-card">
+      <div class="metric-val">31.5M</div>
+      <div class="metric-unit">time steps</div>
+      <div class="metric-desc">One Full Year Simulated</div>
+    </div><div class="metric-card">
+      <div class="metric-val">4</div>
+      <div class="metric-unit">design patterns</div>
+      <div class="metric-desc">Singleton·Visitor·Factory·Prototype</div>
+    </div></div>
+    </div>
+  </div>
+</div>
+<script>
+window.addEventListener('scroll',()=>{
+  const p=document.getElementById('progressBar');
+  p.style.width=Math.min((window.scrollY/(document.body.scrollHeight-window.innerHeight))*100,100)+'%';
+});
+</script>
+</body>
+</html>

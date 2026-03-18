@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Esteban Zamora — Advanced Soil Sensor System</title>
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="project-detail.css">
+</head>
+<body>
+<div class="bg-art"><div class="orb orb-1"></div><div class="orb orb-2"></div><div class="orb orb-3"></div></div>
+<div class="progress-bar" id="progressBar"></div>
+<nav>
+  <a class="nav-logo" href="index.html">EZ.DEV</a>
+  <div class="nav-links">
+    <a href="about.html">About</a>
+    <a href="index.html" class="active">Work</a>
+    <a href="resume.pdf" target="_blank">Résumé</a>
+    <a href="https://github.com/esteban-zamora" target="_blank" class="nav-cta">GitHub ↗</a>
+  </div>
+</nav>
+<div class="detail-hero">
+  <div class="detail-hero-bg card-v1">
+    <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:120px;opacity:0.18;filter:drop-shadow(0 0 60px #4f9cf9)">🌱</div>
+    <div style="position:absolute;inset:0;opacity:0.05;background-image:linear-gradient(rgba(255,255,255,.5)1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.5)1px,transparent 1px);background-size:48px 48px;"></div>
+  </div>
+  <div class="detail-hero-overlay"></div>
+  <a class="detail-back" href="index.html">← All Projects</a>
+  <div class="detail-hero-content">
+    <div class="detail-eyebrow">Feb 2025 – Jun 2025 · Active</div>
+    <h1 class="detail-title">Advanced Soil Sensor System</h1>
+    <div class="detail-tags"><span class="detail-tag">C</span><span class="detail-tag">Arduino Mega</span><span class="detail-tag">Modbus-RTU</span><span class="detail-tag">RS-485</span><span class="detail-tag">LCD</span><span class="detail-tag">Git</span><span class="detail-tag">Team Lead</span></div>
+  </div>
+</div>
+<div class="detail-body">
+  <div class="detail-grid">
+    <div class="detail-section full ab">
+      <div class="slabel">◎ Overview</div>
+      <p class="stext" style="font-size:16px;line-height:1.9;">A multi-node industrial sensor platform implementing Modbus-RTU over RS-485 to poll an NPK (Nitrogen, Phosphorus, Potassium) soil sensor and stream calibrated live readings to an LCD display. Led as team lead, achieving 88.9% validated measurement accuracy against certified soil references.</p>
+    </div>
+  </div>
+  <div style="margin-top:2px;" class="detail-grid">
+    <div class="detail-section ab2">
+      <div class="slabel">⊙ System Objective</div>
+      <p class="stext">Design and implement a real-time soil nutrient monitoring system capable of querying an industrial NPK sensor over a multi-node RS-485 bus using the Modbus-RTU protocol, calibrate raw register values to engineering units, and display live readings on an LCD.</p>
+    </div>
+    <div class="detail-section">
+      <div class="slabel">⊘ Design Constraints</div>
+      <div class="spec-list"><div class="spec-item">RS-485 bus must support multi-node topology; firmware must handle bus arbitration and direction switching</div><div class="spec-item">Modbus-RTU register map must exactly match sensor vendor specification; off-by-one addressing causes total read failure</div><div class="spec-item">ADC scaling must convert raw 16-bit register values to calibrated ppm readings via vendor-provided voltage decode equations</div><div class="spec-item">LCD update latency must not block the polling cycle; display writes must be non-blocking</div><div class="spec-item">System must achieve ≥85% accuracy against certified soil reference standards</div></div>
+    </div>
+  </div>
+  <div style="margin-top:2px;">
+    <div class="detail-section full">
+      <div class="slabel">⊞ System Architecture</div>
+      <div class="arch-diagram">┌──────────────────────────────────────────────────────┐
+│              SOIL SENSOR SYSTEM ARCHITECTURE          │
+├──────────────────────────────────────────────────────┤
+│                                                       │
+│   <span class="ah">[Arduino Mega]</span>  ──UART<span class="ah2">──►</span>  <span class="ah">[RS-485 Transceiver]</span>    │
+│         │                         │                  │
+│    Firmware (C)             RS-485 Bus (Half-Duplex)  │
+│    ├─ Modbus-RTU                   │                  │
+│    ├─ CRC-16 Engine          <span class="ah">[NPK Sensor Node]</span>        │
+│    ├─ Register Map           Modbus Slave ID: 0x01    │
+│    └─ LCD Driver                   │                  │
+│         │                   Register 0x1E – N (ppm)  │
+│   <span class="ah">[16x2 LCD]</span>                Register 0x1F – P (ppm)  │
+│   Live NPK Readings         Register 0x20 – K (ppm)  │
+│                                                       │
+└──────────────────────────────────────────────────────┘</div>
+    </div>
+  </div>
+  <div style="margin-top:2px;" class="detail-grid">
+    <div class="detail-section ab3">
+      <div class="slabel">⊛ Firmware Architecture</div>
+      <p class="stext">The firmware operates as a Modbus-RTU master on an Arduino Mega. A polling loop initiates a Read Holding Registers (FC 0x03) request targeting registers 0x1E–0x20 on slave address 0x01. Request frames are assembled byte-by-byte with CRC-16 appended, transmitted over UART with MAX485 direction-pin control, then the bus is switched to receive mode. The response parser validates slave address, function code, byte count, payload, and CRC before extracting the three 16-bit register values. Raw counts are decoded to ppm using the vendor voltage equation. On fault (timeout, CRC mismatch, exception code), the system logs the fault type and retries. LCD updates occur after each valid response cycle.</p>
+    </div>
+    <div class="detail-section abg">
+      <div class="slabel">◈ Determinism &amp; Hard Real-Time Guarantees</div>
+      <p class="stext">The polling loop executes at a fixed 1 Hz cadence controlled by a millis()-based scheduler — no blocking delays inside the communication path. RS-485 direction switching is performed with explicit GPIO assertion/de-assertion before and after UART transmit, ensuring no bus contention. CRC-16 is computed inline in O(n) time bounded by the fixed 8-byte request frame. The worst-case response window is bounded by the sensor's 200 ms maximum response time plus a 50 ms guard interval, giving a deterministic 250 ms timeout.</p>
+    </div>
+  </div>
+  <div style="margin-top:2px;">
+    <div class="detail-section full">
+      <div class="slabel">◑ Key Metrics</div>
+      <div class="metric-grid"><div class="metric-card">
+      <div class="metric-val">88.9</div>
+      <div class="metric-unit">%</div>
+      <div class="metric-desc">Measurement Accuracy</div>
+    </div><div class="metric-card">
+      <div class="metric-val">1</div>
+      <div class="metric-unit">Hz</div>
+      <div class="metric-desc">Polling Rate</div>
+    </div><div class="metric-card">
+      <div class="metric-val">250</div>
+      <div class="metric-unit">ms</div>
+      <div class="metric-desc">Deterministic Timeout</div>
+    </div></div>
+    </div>
+  </div>
+</div>
+<script>
+window.addEventListener('scroll',()=>{
+  const p=document.getElementById('progressBar');
+  p.style.width=Math.min((window.scrollY/(document.body.scrollHeight-window.innerHeight))*100,100)+'%';
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Esteban Zamora — Calibrated Measurement Microscope</title>
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="project-detail.css">
+</head>
+<body>
+<div class="bg-art"><div class="orb orb-1"></div><div class="orb orb-2"></div><div class="orb orb-3"></div></div>
+<div class="progress-bar" id="progressBar"></div>
+<nav>
+  <a class="nav-logo" href="index.html">EZ.DEV</a>
+  <div class="nav-links">
+    <a href="about.html">About</a>
+    <a href="index.html" class="active">Work</a>
+    <a href="resume.pdf" target="_blank">Résumé</a>
+    <a href="https://github.com/esteban-zamora" target="_blank" class="nav-cta">GitHub ↗</a>
+  </div>
+</nav>
+<div class="detail-hero">
+  <div class="detail-hero-bg card-v6">
+    <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:120px;opacity:0.18;filter:drop-shadow(0 0 60px #f4a261)">🔬</div>
+    <div style="position:absolute;inset:0;opacity:0.05;background-image:linear-gradient(rgba(255,255,255,.5)1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.5)1px,transparent 1px);background-size:48px 48px;"></div>
+  </div>
+  <div class="detail-hero-overlay"></div>
+  <a class="detail-back" href="index.html">← All Projects</a>
+  <div class="detail-hero-content">
+    <div class="detail-eyebrow">Feb 2025 – Mar 2025 · Complete</div>
+    <h1 class="detail-title">Calibrated Measurement Microscope</h1>
+    <div class="detail-tags"><span class="detail-tag">Python</span><span class="detail-tag">Raspberry Pi</span><span class="detail-tag">Computer Vision</span><span class="detail-tag">OpenCV</span><span class="detail-tag">PCB Inspection</span></div>
+  </div>
+</div>
+<div class="detail-body">
+  <div class="detail-grid">
+    <div class="detail-section full ab">
+      <div class="slabel">◎ Overview</div>
+      <p class="stext" style="font-size:16px;line-height:1.9;">A Python-controlled Raspberry Pi digital microscope system with automated camera settings, LED lighting control, zoom functionality, and pixel-to-micron spatial calibration for quantitative PCB component inspection down to 0402 size.</p>
+    </div>
+  </div>
+  <div style="margin-top:2px;" class="detail-grid">
+    <div class="detail-section ab2">
+      <div class="slabel">⊙ System Objective</div>
+      <p class="stext">Develop a reproducible, calibrated digital microscope platform for PCB inspection that eliminates manual measurement tools by overlaying a real-time calibrated scale bar on the live camera feed, enabling direct on-screen dimensional measurement of components.</p>
+    </div>
+    <div class="detail-section">
+      <div class="slabel">⊘ Design Constraints</div>
+      <div class="spec-list"><div class="spec-item">Pixel-to-micron ratio must be established from a reference scale and stored persistently for reproducible measurement</div><div class="spec-item">Scale bar must update in real-time as zoom level changes to remain accurate</div><div class="spec-item">Camera settings (exposure, white balance, gain) must be automatable to ensure consistent imaging conditions</div><div class="spec-item">System must be operable by lab members without prior calibration knowledge — full setup documented</div><div class="spec-item">Must resolve features at 0402 component scale (approx. 1.0 mm × 0.5 mm)</div></div>
+    </div>
+  </div>
+  <div style="margin-top:2px;">
+    <div class="detail-section full">
+      <div class="slabel">⊞ System Architecture</div>
+      <div class="arch-diagram">┌──────────────────────────────────────────────────────┐
+│       MEASUREMENT MICROSCOPE ARCHITECTURE             │
+├──────────────────────────────────────────────────────┤
+│                                                       │
+│  Hardware Layer                                       │
+│   <span class="ah">[Raspberry Pi]</span> ──CSI<span class="ah2">──►</span> <span class="ah">[Camera Module]</span>             │
+│   <span class="ah">[Raspberry Pi]</span> ──GPIO<span class="ah2">──►</span> <span class="ah">[LED Ring Lighting]</span>        │
+│                                                       │
+│  Software Layer (Python)                              │
+│   ├─ Camera Control: exposure, gain, white balance    │
+│   ├─ Calibration Module:                              │
+│   │    reference_scale <span class="ah2">──►</span> px_per_micron ratio        │
+│   │    stored in calibration.json                     │
+│   ├─ Scale Bar Renderer:                              │
+│   │    px_per_micron × bar_length <span class="ah2">──►</span> overlay pixels  │
+│   └─ Display Loop: capture <span class="ah2">──►</span> annotate <span class="ah2">──►</span> show      │
+│                                                       │
+│  Output: Live annotated feed + measurement capability │
+│                                                       │
+└──────────────────────────────────────────────────────┘</div>
+    </div>
+  </div>
+  <div style="margin-top:2px;" class="detail-grid">
+    <div class="detail-section ab3">
+      <div class="slabel">⊛ Firmware Architecture</div>
+      <p class="stext">The Python application initializes the camera with explicit exposure time, analogue gain, and AWB settings to ensure consistent imaging. An LED ring connected to GPIO is toggled on at startup for diffuse illumination. The calibration routine captures a frame with a reference scale, allows the user to mark two known points, computes the pixel distance, and derives the px_per_micron ratio saved to a JSON file. In the live view loop, each captured frame passes to the scale bar renderer, which reads the current px_per_micron and draws a scale bar of a chosen physical length (e.g., 500 µm) by computing bar_pixels = bar_microns × px_per_micron. The annotated frame is displayed via OpenCV.</p>
+    </div>
+    <div class="detail-section abg">
+      <div class="slabel">◈ Determinism &amp; Hard Real-Time Guarantees</div>
+      <p class="stext">Frame capture is not hard real-time, but scale bar computation is deterministic O(1) given the stored calibration constant. The rendering pipeline adds fixed-latency annotation with no variable-time processing. Camera control parameters are set once at initialization and do not change during the session, ensuring stable imaging conditions throughout use.</p>
+    </div>
+  </div>
+  <div style="margin-top:2px;">
+    <div class="detail-section full">
+      <div class="slabel">◑ Key Metrics</div>
+      <div class="metric-grid"><div class="metric-card">
+      <div class="metric-val">0402</div>
+      <div class="metric-unit">size</div>
+      <div class="metric-desc">Min. Resolvable Component</div>
+    </div><div class="metric-card">
+      <div class="metric-val">µm</div>
+      <div class="metric-unit">precision</div>
+      <div class="metric-desc">Pixel-to-Micron Calibrated</div>
+    </div><div class="metric-card">
+      <div class="metric-val">GPIO</div>
+      <div class="metric-unit">LED control</div>
+      <div class="metric-desc">Automated Illumination</div>
+    </div></div>
+    </div>
+  </div>
+</div>
+<script>
+window.addEventListener('scroll',()=>{
+  const p=document.getElementById('progressBar');
+  p.style.width=Math.min((window.scrollY/(document.body.scrollHeight-window.innerHeight))*100,100)+'%';
+});
+</script>
+</body>
+</html>

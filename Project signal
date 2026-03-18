@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Esteban Zamora — Programmable Signal Generator</title>
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="project-detail.css">
+</head>
+<body>
+<div class="bg-art"><div class="orb orb-1"></div><div class="orb orb-2"></div><div class="orb orb-3"></div></div>
+<div class="progress-bar" id="progressBar"></div>
+<nav>
+  <a class="nav-logo" href="index.html">EZ.DEV</a>
+  <div class="nav-links">
+    <a href="about.html">About</a>
+    <a href="index.html" class="active">Work</a>
+    <a href="resume.pdf" target="_blank">Résumé</a>
+    <a href="https://github.com/esteban-zamora" target="_blank" class="nav-cta">GitHub ↗</a>
+  </div>
+</nav>
+<div class="detail-hero">
+  <div class="detail-hero-bg card-v4">
+    <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:120px;opacity:0.18;filter:drop-shadow(0 0 60px #a78bfa)">〰️</div>
+    <div style="position:absolute;inset:0;opacity:0.05;background-image:linear-gradient(rgba(255,255,255,.5)1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.5)1px,transparent 1px);background-size:48px 48px;"></div>
+  </div>
+  <div class="detail-hero-overlay"></div>
+  <a class="detail-back" href="index.html">← All Projects</a>
+  <div class="detail-hero-content">
+    <div class="detail-eyebrow">Fall 2025 · Complete</div>
+    <h1 class="detail-title">Programmable Signal Generator</h1>
+    <div class="detail-tags"><span class="detail-tag">AVR Assembly</span><span class="detail-tag">ATmega328P</span><span class="detail-tag">AD7302 DAC</span><span class="detail-tag">Oscilloscope Verification</span></div>
+  </div>
+</div>
+<div class="detail-body">
+  <div class="detail-grid">
+    <div class="detail-section full ab">
+      <div class="slabel">◎ Overview</div>
+      <p class="stext" style="font-size:16px;line-height:1.9;">AVR Assembly firmware that drives an Analog Devices AD7302 8-bit parallel DAC to synthesize sine, triangle, square, sawtooth, and trapezoid waveforms at user-programmable frequencies. Verified on oscilloscope.</p>
+    </div>
+  </div>
+  <div style="margin-top:2px;" class="detail-grid">
+    <div class="detail-section ab2">
+      <div class="slabel">⊙ System Objective</div>
+      <p class="stext">Implement a software-driven digital function generator in AVR assembly that produces multiple waveform types across a programmable frequency range, driving an external parallel DAC via PORTD with precise timing control.</p>
+    </div>
+    <div class="detail-section">
+      <div class="slabel">⊘ Design Constraints</div>
+      <div class="spec-list"><div class="spec-item">Waveform data must be output via PORTD (8 data bits) with CS# pulse on PORTC pin 0 meeting AD7302 setup/hold times</div><div class="spec-item">CS# must be held low for ≥1 µs per conversion — enforced by a calibrated NOP sequence</div><div class="spec-item">Frequency is controlled by an inner delay loop; the loop count is a programmable parameter</div><div class="spec-item">Sine wave requires a pre-computed lookup table stored in program memory and accessed via LPM</div><div class="spec-item">Trapezoid wave requires a flat area subroutine that holds the output constant for N cycles</div></div>
+    </div>
+  </div>
+  <div style="margin-top:2px;">
+    <div class="detail-section full">
+      <div class="slabel">⊞ System Architecture</div>
+      <div class="arch-diagram">┌───────────────────────────────────────────────────────┐
+│          SIGNAL GENERATOR ARCHITECTURE                 │
+├───────────────────────────────────────────────────────┤
+│                                                        │
+│  ATmega328P                                            │
+│   PORTD<span class="ah">[7:0]</span> <span class="ah2">──►</span> <span class="ah">[AD7302 DAC]</span> Data Bus (8-bit)        │
+│   PORTC<span class="ah">[0]</span>   <span class="ah2">──►</span> ~CS (Chip Select, active low)        │
+│                                                        │
+│  Waveform Engine                                       │
+│   ├─ mainLoop: output byte → pulse CS# → delay        │
+│   ├─ countUp:  increment counter 0x00→0xFF            │
+│   ├─ countDown: decrement 0xFF→0x00 (triangle)        │
+│   ├─ flatarea: hold value N cycles (trapezoid)        │
+│   └─ sine table: 256-entry LUT in .cseg               │
+│                                                        │
+│  Frequency Control                                     │
+│   <span class="ah">[delayMs]</span>: countdown loop (r19 = freq divisor)      │
+│   Higher r19 → lower frequency                        │
+│                                                        │
+│  <span class="ah">[AD7302]</span> <span class="ah2">──►</span> RC Low-Pass Filter <span class="ah2">──►</span> Oscilloscope     │
+│                                                        │
+└───────────────────────────────────────────────────────┘</div>
+    </div>
+  </div>
+  <div style="margin-top:2px;" class="detail-grid">
+    <div class="detail-section ab3">
+      <div class="slabel">⊛ Firmware Architecture</div>
+      <p class="stext">Each waveform program follows the same pattern: load the next output value into r18, write it to PORTD, clear PORTC bit 0 (assert CS#), execute a 1-µs NOP sequence, set PORTC bit 0 (release CS#), call delayMs for frequency control, then loop. The triangle wave uses countUp/countDown subroutines alternating between incrementing and decrementing r18. The trapezoid adds a flatarea routine holding the current value for extra cycles at both peaks. The sine wave uses LPM with a Z-pointer stepping through a 256-entry sine table in .cseg. Frequency is controlled by r19's initial value — the delay loop decrements to zero so larger values produce longer delays and lower frequencies.</p>
+    </div>
+    <div class="detail-section abg">
+      <div class="slabel">◈ Determinism &amp; Hard Real-Time Guarantees</div>
+      <p class="stext">Timing determinism is achieved entirely through instruction-cycle counting. The 1-µs CS# pulse width is enforced by a NOP sequence computed from the 16 MHz clock (16 cycles = 1 µs). The delayMs inner loop executes a fixed number of cycles per count (dec + brne = 2 cycles), so the output rate is fully deterministic given the frequency divisor. No interrupts or timers are used — the waveform loop owns the CPU completely, guaranteeing jitter-free output bounded only by the DAC conversion latency.</p>
+    </div>
+  </div>
+  <div style="margin-top:2px;">
+    <div class="detail-section full">
+      <div class="slabel">◑ Key Metrics</div>
+      <div class="metric-grid"><div class="metric-card">
+      <div class="metric-val">5</div>
+      <div class="metric-unit">waveforms</div>
+      <div class="metric-desc">Sine, Triangle, Square, Sawtooth, Trapezoid</div>
+    </div><div class="metric-card">
+      <div class="metric-val">1µs</div>
+      <div class="metric-unit">CS# pulse</div>
+      <div class="metric-desc">NOP-Enforced DAC Timing</div>
+    </div><div class="metric-card">
+      <div class="metric-val">256</div>
+      <div class="metric-unit">entry LUT</div>
+      <div class="metric-desc">Sine Lookup Table</div>
+    </div></div>
+    </div>
+  </div>
+</div>
+<script>
+window.addEventListener('scroll',()=>{
+  const p=document.getElementById('progressBar');
+  p.style.width=Math.min((window.scrollY/(document.body.scrollHeight-window.innerHeight))*100,100)+'%';
+});
+</script>
+</body>
+</html>

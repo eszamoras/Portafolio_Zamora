@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Esteban Zamora — Autonomous Maze-Solving Robot</title>
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="project-detail.css">
+</head>
+<body>
+<div class="bg-art"><div class="orb orb-1"></div><div class="orb orb-2"></div><div class="orb orb-3"></div></div>
+<div class="progress-bar" id="progressBar"></div>
+<nav>
+  <a class="nav-logo" href="index.html">EZ.DEV</a>
+  <div class="nav-links">
+    <a href="about.html">About</a>
+    <a href="index.html" class="active">Work</a>
+    <a href="resume.pdf" target="_blank">Résumé</a>
+    <a href="https://github.com/esteban-zamora" target="_blank" class="nav-cta">GitHub ↗</a>
+  </div>
+</nav>
+<div class="detail-hero">
+  <div class="detail-hero-bg card-v2">
+    <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:120px;opacity:0.18;filter:drop-shadow(0 0 60px #ef4444)">🤖</div>
+    <div style="position:absolute;inset:0;opacity:0.05;background-image:linear-gradient(rgba(255,255,255,.5)1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.5)1px,transparent 1px);background-size:48px 48px;"></div>
+  </div>
+  <div class="detail-hero-overlay"></div>
+  <a class="detail-back" href="index.html">← All Projects</a>
+  <div class="detail-hero-content">
+    <div class="detail-eyebrow">Nov 2025 · Complete</div>
+    <h1 class="detail-title">Autonomous Maze-Solving Robot</h1>
+    <div class="detail-tags"><span class="detail-tag">C</span><span class="detail-tag">ATmega32U4</span><span class="detail-tag">PID</span><span class="detail-tag">FSM</span><span class="detail-tag">Embedded Control</span><span class="detail-tag">OLED</span></div>
+  </div>
+</div>
+<div class="detail-body">
+  <div class="detail-grid">
+    <div class="detail-section full ab">
+      <div class="slabel">◎ Overview</div>
+      <p class="stext" style="font-size:16px;line-height:1.9;">A fully autonomous line-maze-solving robot built on the Pololu 3pi+ (ATmega32U4) platform. Implements PID line-following, a left-hand rule FSM for intersection decision-making, and path-reduction algorithms to optimize second-run traversal.</p>
+    </div>
+  </div>
+  <div style="margin-top:2px;" class="detail-grid">
+    <div class="detail-section ab2">
+      <div class="slabel">⊙ System Objective</div>
+      <p class="stext">Design, implement, and validate a real-time embedded control system capable of navigating an unknown line maze, recording the full decision path during exploration, applying path-reduction to compute the shortest route, and executing the optimized second run without entering any dead ends.</p>
+    </div>
+    <div class="detail-section">
+      <div class="slabel">⊘ Design Constraints</div>
+      <div class="spec-list"><div class="spec-item">All firmware must execute on the ATmega32U4 at 16 MHz with no OS; all timing must be software-managed</div><div class="spec-item">PID loop must run fast enough to maintain line tracking at navigating speeds without CPU saturation</div><div class="spec-item">FSM must resolve ambiguous intersections (straight-or-right, straight-or-left) using inch-forward sensing</div><div class="spec-item">Path array is statically allocated — buffer overflow must be prevented at compile time</div><div class="spec-item">Path-reduction algorithm must handle all three-step patterns (L-U-L, L-U-S, L-U-R, S-U-S) in multi-pass</div></div>
+    </div>
+  </div>
+  <div style="margin-top:2px;">
+    <div class="detail-section full">
+      <div class="slabel">⊞ System Architecture</div>
+      <div class="arch-diagram">┌─────────────────────────────────────────────────────────┐
+│           MAZE ROBOT SYSTEM ARCHITECTURE                 │
+├─────────────────────────────────────────────────────────┤
+│                                                          │
+│  SENSING LAYER                                           │
+│   <span class="ah">[5-Element Reflectance Array]</span>  <span class="ah2">──►</span>  line_sensors.h    │
+│                                                          │
+│  CONTROL LAYER                                           │
+│   Sensor Data <span class="ah2">──►</span> <span class="ah">[PID Controller]</span> <span class="ah2">──►</span> Motor Speeds     │
+│                   Kp=32 Kd=128 Ki=0                      │
+│                                                          │
+│  DECISION LAYER                                          │
+│   Sensor Pattern <span class="ah2">──►</span> <span class="ah">[Intersection FSM]</span>                  │
+│                       ├─ Inch Forward (ambiguity resolve)│
+│                       ├─ Left-Hand Rule Priority         │
+│                       └─ L / R / S / U → Path Array     │
+│                                                          │
+│  OPTIMIZATION LAYER                                      │
+│   Path Array <span class="ah2">──►</span> <span class="ah">[simplify_path()]</span> <span class="ah2">──►</span> Optimal Route    │
+│                                                          │
+│  OUTPUT                                                  │
+│   Motor Drivers + <span class="ah">[OLED Debug Display]</span>                   │
+│                                                          │
+└─────────────────────────────────────────────────────────┘</div>
+    </div>
+  </div>
+  <div style="margin-top:2px;" class="detail-grid">
+    <div class="detail-section ab3">
+      <div class="slabel">⊛ Firmware Architecture</div>
+      <p class="stext">The firmware is structured into three cooperating layers. The lowest layer provides a line_sensors_read() driver returning a calibrated position value (0–4000). The PID controller computes error = position − 2000, maintains a running integral clamped to I_TERM_MAX=150, and outputs differential speed corrections. The intersection FSM classifies junctions (L, R, S, B, T) using the inch-forward technique. The left-hand rule priority table selects the turn direction, pushed to the path array. After the end node is found, simplify_path() performs multi-pass reduction (L-U-L→S, etc.) to produce the optimal second-run route.</p>
+    </div>
+    <div class="detail-section abg">
+      <div class="slabel">◈ Determinism &amp; Hard Real-Time Guarantees</div>
+      <p class="stext">The PID loop runs on every main-loop iteration with no OS preemption. Turn routines use calibrated delay-based timing (g_turnDelay_ms = 200 ms) rather than sensor polling during turns — bounded execution. The path array is statically sized (128 entries) so no dynamic allocation occurs. OLED writes are batched after decision points and do not occur inside the PID loop. Interrupt-driven motor PWM runs independently at hardware timer frequency, guaranteeing consistent motor actuation regardless of firmware execution variance.</p>
+    </div>
+  </div>
+  <div style="margin-top:2px;">
+    <div class="detail-section full">
+      <div class="slabel">◑ Key Metrics</div>
+      <div class="metric-grid"><div class="metric-card">
+      <div class="metric-val">2-run</div>
+      <div class="metric-unit"></div>
+      <div class="metric-desc">Explore + Optimize</div>
+    </div><div class="metric-card">
+      <div class="metric-val">PID</div>
+      <div class="metric-unit">Kp=32 Kd=128</div>
+      <div class="metric-desc">Tuned Gains</div>
+    </div><div class="metric-card">
+      <div class="metric-val">O(n)</div>
+      <div class="metric-unit">path reduce</div>
+      <div class="metric-desc">Multi-pass Simplification</div>
+    </div></div>
+    </div>
+  </div>
+</div>
+<script>
+window.addEventListener('scroll',()=>{
+  const p=document.getElementById('progressBar');
+  p.style.width=Math.min((window.scrollY/(document.body.scrollHeight-window.innerHeight))*100,100)+'%';
+});
+</script>
+</body>
+</html>

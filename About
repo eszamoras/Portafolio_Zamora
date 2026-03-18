@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Esteban Zamora — About</title>
+<link rel="stylesheet" href="style.css">
+<style>
+  body { padding-top: 64px; }
+  .about-wrap { max-width:1100px;margin:0 auto;padding:100px 64px 120px;position:relative;z-index:1; }
+
+  .bio-section { margin-bottom:80px;animation:fadeUp 0.7s ease forwards; }
+  .about-headline { font-family:var(--font-display);font-size:clamp(32px,4vw,56px);font-weight:300;line-height:1.15;margin-bottom:28px; }
+  .about-headline em { font-style:italic;color:var(--accent); }
+  .about-p { font-size:15px;font-weight:300;color:var(--text-muted);max-width:700px;line-height:1.85;margin-bottom:16px; }
+  .about-p strong { color:var(--text);font-weight:400; }
+
+  .expertise-section { margin-bottom:0;animation:fadeUp 0.8s ease 0.1s forwards;opacity:0; }
+  .expertise-grid { display:grid;grid-template-columns:repeat(3,1fr);gap:2px; }
+  .expertise-card { padding:32px;background:var(--surface);border:1px solid var(--border); }
+  .expertise-icon { font-size:28px;margin-bottom:16px; }
+  .expertise-title { font-size:14px;font-weight:500;margin-bottom:10px;letter-spacing:0.02em; }
+  .expertise-desc { font-size:13px;font-weight:300;color:var(--text-muted);line-height:1.7; }
+
+  @media(max-width:900px){
+    .about-wrap{padding:60px 24px 80px;}
+    .expertise-grid{grid-template-columns:1fr 1fr;}
+  }
+  @media(max-width:600px){
+    .expertise-grid{grid-template-columns:1fr;}
+  }
+</style>
+</head>
+<body>
+<div class="bg-art"><div class="orb orb-1"></div><div class="orb orb-2"></div><div class="orb orb-3"></div></div>
+<div class="progress-bar" id="progressBar"></div>
+
+<nav>
+  <a class="nav-logo" href="index.html">EZ.DEV</a>
+  <div class="nav-links">
+    <a href="about.html" class="active">About</a>
+    <a href="index.html">Work</a>
+    <a href="resume.pdf" target="_blank">Résumé</a>
+    <a href="https://github.com/esteban-zamora" target="_blank" class="nav-cta">GitHub ↗</a>
+  </div>
+</nav>
+
+<div class="about-wrap">
+
+  <div class="bio-section">
+    <div class="eyebrow">About</div>
+    <h1 class="about-headline">I build systems where<br><em>software meets physics.</em></h1>
+    <p class="about-p">I'm an Electrical &amp; Computer Engineering student at <strong>Vanderbilt University</strong> concentrating in Embedded Computing and Cyber-Physical Systems. My work lives at the boundary between hardware and software — register-level firmware, real-time control loops, industrial communication protocols, and full sensor-to-software data acquisition pipelines deployed on live research and production hardware.</p>
+    <p class="about-p">I'm drawn to roles where engineering precision is not optional — medical devices, industrial automation, robotics, and autonomous platforms. Systems where a bug isn't a ticket, it's a consequence.</p>
+  </div>
+
+  <div class="expertise-section">
+    <div class="eyebrow" style="margin-bottom:28px;">Expertise</div>
+    <div class="expertise-grid">
+      <div class="expertise-card" style="border-top:3px solid var(--accent);">
+        <div class="expertise-icon">⚡</div>
+        <div class="expertise-title">Embedded Firmware</div>
+        <div class="expertise-desc">Register-level C and AVR Assembly on ATmega platforms. Interrupt-driven peripherals, timer-based scheduling, hardware abstraction layers.</div>
+      </div>
+      <div class="expertise-card" style="border-top:3px solid var(--accent2);">
+        <div class="expertise-icon">📡</div>
+        <div class="expertise-title">Communication Protocols</div>
+        <div class="expertise-desc">Modbus-RTU/TCP over RS-485, I²C, SPI, UART, PWM, GPIO. Multi-node bus topologies and industrial fieldbus systems.</div>
+      </div>
+      <div class="expertise-card" style="border-top:3px solid var(--accent3);">
+        <div class="expertise-icon">🔁</div>
+        <div class="expertise-title">Real-Time Control</div>
+        <div class="expertise-desc">PID closed-loop control, FSM design, deterministic scheduling, and hardware-in-the-loop testing and validation.</div>
+      </div>
+      <div class="expertise-card">
+        <div class="expertise-icon">🧪</div>
+        <div class="expertise-title">Data Acquisition</div>
+        <div class="expertise-desc">Full pipeline engineering from sensor polling through DAC/ADC conversion into NI DAQ hardware with NIS-Elements GUI integration.</div>
+      </div>
+      <div class="expertise-card">
+        <div class="expertise-icon">🏭</div>
+        <div class="expertise-title">Industrial Automation</div>
+        <div class="expertise-desc">Safety-critical PLC programming in RSLogix 5000, HMI development in FactoryTalk, deployed on live production floors.</div>
+      </div>
+      <div class="expertise-card">
+        <div class="expertise-icon">🎛️</div>
+        <div class="expertise-title">Digital Signal Processing</div>
+        <div class="expertise-desc">Spectrogram feature extraction, windowing, classification pipelines, and FPGA design in SystemVerilog with Quartus/ModelSim.</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+window.addEventListener('scroll',()=>{
+  const p=document.getElementById('progressBar');
+  p.style.width=Math.min((window.scrollY/(document.body.scrollHeight-window.innerHeight))*100,100)+'%';
+});
+</script>
+</body>
+</html>
