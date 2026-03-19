@@ -9,29 +9,46 @@
   body { padding-top: 64px; }
 
   .identity {
-    display: grid; grid-template-columns: 1fr auto;
-    align-items: end; gap: 40px;
-    padding: 72px 64px 52px;
+    display: grid; grid-template-columns: auto 1fr;
+    align-items: center; gap: 64px;
+    padding: 80px 64px 64px;
     max-width: 1400px; margin: 0 auto;
     border-bottom: 1px solid var(--border);
     animation: fadeUp 0.7s ease forwards;
     position: relative; z-index: 1;
   }
+  .identity-photo { flex-shrink: 0; }
+  .photo-frame {
+    width: 200px; height: 200px; border-radius: 50%; overflow: hidden;
+    border: 1px solid var(--border-hover);
+    box-shadow: 0 0 0 6px rgba(79,156,249,0.06), 0 24px 48px rgba(0,0,0,0.5);
+  }
+  .photo-frame img {
+    width: 100%; height: 100%; object-fit: cover; object-position: center 10%;
+    filter: grayscale(10%) contrast(1.05); transition: filter 0.4s;
+  }
+  .photo-frame:hover img { filter: grayscale(0%) contrast(1); }
   .identity-name {
     font-family: var(--font-display);
-    font-size: clamp(44px,6vw,88px); font-weight: 300;
-    line-height: 0.95; letter-spacing: -0.02em; margin-bottom: 24px;
+    font-size: clamp(52px,6vw,96px); font-weight: 300;
+    line-height: 0.92; letter-spacing: -0.025em; margin-bottom: 24px;
   }
   .identity-name span { display: block; }
   .identity-name span:last-child {
-    -webkit-text-stroke: 1px rgba(255,255,255,0.25); color: transparent;
+    -webkit-text-stroke: 1px rgba(255,255,255,0.2); color: transparent;
   }
-  .identity-bio { font-size:15px;font-weight:300;color:var(--text-muted);max-width:660px;line-height:1.8; }
-  .identity-cards { display:flex;flex-direction:column;gap:2px;min-width:210px; }
-  .id-card { padding:16px 20px;background:var(--surface);border:1px solid var(--border); }
-  .id-card-label { font-family:var(--font-mono);font-size:10px;letter-spacing:0.12em;color:var(--text-muted);text-transform:uppercase;margin-bottom:4px; }
-  .id-card-val { font-family:var(--font-display);font-size:28px;font-weight:300;color:var(--text); }
-  .id-card-sub { font-size:11px;font-weight:300;color:var(--text-muted);margin-top:2px; }
+  .identity-bio {
+    font-size: 15px; font-weight: 300; color: var(--text-muted);
+    max-width: 600px; line-height: 1.85; margin-bottom: 28px;
+    font-style: italic; letter-spacing: 0.01em;
+  }
+  .identity-links { display: flex; gap: 24px; }
+  .id-link {
+    font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.1em;
+    color: var(--accent); text-decoration: none; text-transform: uppercase;
+    transition: opacity 0.2s;
+  }
+  .id-link:hover { opacity: 0.7; }
 
   .projects-wrap { padding:64px 64px 120px;max-width:1400px;margin:0 auto;position:relative;z-index:1; }
   .projects-header { margin-bottom:56px; }
@@ -46,16 +63,18 @@
     animation:fadeUp 0.6s ease forwards;opacity:0;
   }
   .project-card:hover { border-color:var(--border-hover);transform:translateY(-2px);z-index:2; }
-  .project-card:nth-child(1){grid-column:span 7;animation-delay:0.05s;}
-  .project-card:nth-child(2){grid-column:span 5;animation-delay:0.1s;}
-  .project-card:nth-child(3){grid-column:span 4;animation-delay:0.15s;}
-  .project-card:nth-child(4){grid-column:span 4;animation-delay:0.2s;}
-  .project-card:nth-child(5){grid-column:span 4;animation-delay:0.25s;}
-  .project-card:nth-child(6){grid-column:span 6;animation-delay:0.3s;}
-  .project-card:nth-child(7){grid-column:span 6;animation-delay:0.35s;}
+  .project-card:nth-child(1){grid-column:span 12;animation-delay:0.02s;}
+  .project-card:nth-child(2){grid-column:span 7;animation-delay:0.05s;}
+  .project-card:nth-child(3){grid-column:span 5;animation-delay:0.1s;}
+  .project-card:nth-child(4){grid-column:span 4;animation-delay:0.15s;}
+  .project-card:nth-child(5){grid-column:span 4;animation-delay:0.2s;}
+  .project-card:nth-child(6){grid-column:span 4;animation-delay:0.25s;}
+  .project-card:nth-child(7){grid-column:span 6;animation-delay:0.3s;}
+  .project-card:nth-child(8){grid-column:span 6;animation-delay:0.35s;}
 
   .card-visual { height:200px;position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center; }
-  .project-card:nth-child(1) .card-visual,.project-card:nth-child(2) .card-visual { height:260px; }
+  .project-card:nth-child(1) .card-visual { height:320px; }
+  .project-card:nth-child(2) .card-visual,.project-card:nth-child(3) .card-visual { height:260px; }
   .card-visual-bg { position:absolute;inset:0;transition:transform 0.5s ease; }
   .project-card:hover .card-visual-bg { transform:scale(1.04); }
   .card-v1{background:linear-gradient(135deg,#0a1628,#0d2040 40%,#0a2a1a);}
@@ -105,26 +124,20 @@
 </nav>
 
 <div class="identity">
-  <div>
-    <div class="eyebrow" style="margin-bottom:16px;">ECE @ Vanderbilt University · Class of 2027</div>
-    <h1 class="identity-name"><span>Esteban</span><span>Zamora</span></h1>
-    <p class="identity-bio">Aspiring <strong style="color:var(--text);font-weight:400;">Embedded Software &amp; Hardware Engineer</strong> with a focus on firmware development, hardware-software integration, and real-time systems. I program register-level C and AVR Assembly drivers, implement industrial communication protocols (I²C, Modbus-RTU, RS-485), and engineer full sensor-to-software data acquisition pipelines deployed on live research and industrial hardware. Drawn to systems where engineering precision is not optional — it is the standard.</p>
+  <div class="identity-photo">
+    <div class="photo-frame">
+      <img src="esteban.jpg" alt="Esteban Zamora" />
+    </div>
   </div>
-  <div class="identity-cards">
-    <div class="id-card" style="border-left:3px solid var(--accent);">
-      <div class="id-card-label">GPA</div>
-      <div class="id-card-val">3.682</div>
-      <div class="id-card-sub">Dean's List</div>
-    </div>
-    <div class="id-card" style="border-left:3px solid var(--accent2);">
-      <div class="id-card-label">Research</div>
-      <div class="id-card-val" style="font-size:14px;font-family:var(--font-body);margin-top:4px;">BioMIID Lab</div>
-      <div class="id-card-sub">Jan 2026 – Present</div>
-    </div>
-    <div class="id-card" style="border-left:3px solid var(--accent3);">
-      <div class="id-card-label">Industry</div>
-      <div class="id-card-val" style="font-size:14px;font-family:var(--font-body);margin-top:4px;">Novelis · PLC Intern</div>
-      <div class="id-card-sub">Summer 2025</div>
+  <div class="identity-text">
+    <div class="eyebrow" style="margin-bottom:20px;">Electrical & Computer Engineering · Vanderbilt University · Class of 2027</div>
+    <h1 class="identity-name"><span>Esteban</span><span>Zamora</span></h1>
+    <p class="identity-bio">
+      Embedded software engineer with a foundation in firmware, real-time control, and precision instrumentation. I write register-level C and AVR Assembly, architect full sensor-to-software acquisition pipelines on live research hardware, and implement industrial communication protocols from the ground up. Drawn to systems where a line of code carries physical consequence.
+    </p>
+    <div class="identity-links">
+      <a href="about.html" class="id-link">About →</a>
+      <a href="resume.pdf" target="_blank" class="id-link">Résumé →</a>
     </div>
   </div>
 </div>
@@ -136,6 +149,40 @@
     <p class="projects-sub">Systems where software carries direct physical consequences — built from the register up.</p>
   </div>
   <div class="projects-grid">
+    <div class="project-card biomiid-card" onclick="location.href='project-biomiid.html'">
+      <div class="card-visual">
+        <div class="card-visual-bg" style="background:linear-gradient(135deg,#04111e 0%,#071a2e 40%,#04161a 100%);"></div>
+        <div class="card-circuit"></div>
+        <div style="position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;gap:16px;">
+          <div style="font-size:64px;opacity:0.55;filter:drop-shadow(0 0 28px #4f9cf9);">🔬</div>
+          <div style="font-family:var(--font-mono);font-size:11px;letter-spacing:0.18em;color:rgba(79,156,249,0.7);text-transform:uppercase;">Live Research Hardware</div>
+        </div>
+        <span class="card-status status-active">Active · BioMIID Lab</span>
+      </div>
+      <div class="card-body" style="display:grid;grid-template-columns:1fr 1fr;gap:0 48px;">
+        <div>
+          <div class="card-tags"><span class="tag">C</span><span class="tag">Arduino Mega</span><span class="tag">I²C</span><span class="tag">AD5669 DAC</span><span class="tag">NI PCIe-6353</span><span class="tag">NIS-Elements</span></div>
+          <div class="card-title" style="font-size:28px;">Live-Cell Microscopy<br>Data Acquisition System</div>
+          <div class="card-desc">Real-time C firmware for a live-cell microscopy platform at Vanderbilt's BioMIID Lab. Architects a full signal chain from 4-sensor I²C polling on an Arduino Mega through a 16-bit AD5669 DAC into a calibrated NI PCIe-6353 DAQ, with NIS-Elements GUI integration and oscilloscope-verified fault isolation.</div>
+        </div>
+        <div style="display:flex;flex-direction:column;justify-content:center;gap:12px;padding-top:8px;">
+          <div style="padding:16px 20px;background:var(--bg);border:1px solid var(--border);border-left:2px solid var(--accent);">
+            <div style="font-family:var(--font-mono);font-size:10px;letter-spacing:0.12em;color:var(--text-muted);text-transform:uppercase;margin-bottom:4px;">Signal Chain</div>
+            <div style="font-size:13px;font-weight:300;color:var(--text-dim);">I²C sensors → AD5669 DAC → NI PCIe-6353 → NIS-Elements GUI</div>
+          </div>
+          <div style="padding:16px 20px;background:var(--bg);border:1px solid var(--border);border-left:2px solid var(--accent2);">
+            <div style="font-family:var(--font-mono);font-size:10px;letter-spacing:0.12em;color:var(--text-muted);text-transform:uppercase;margin-bottom:4px;">Sensors</div>
+            <div style="font-size:13px;font-weight:300;color:var(--text-dim);">Temperature · pH · Humidity · Volumetric Water Content</div>
+          </div>
+          <div style="padding:16px 20px;background:var(--bg);border:1px solid var(--border);border-left:2px solid var(--accent3);">
+            <div style="font-family:var(--font-mono);font-size:10px;letter-spacing:0.12em;color:var(--text-muted);text-transform:uppercase;margin-bottom:4px;">Validation</div>
+            <div style="font-size:13px;font-weight:300;color:var(--text-dim);">Oscilloscope-confirmed · RTD fault isolation · DAC gain calibration</div>
+          </div>
+        </div>
+        <div class="card-arrow" style="opacity:1;transform:none;margin-top:8px;">View Full Project →</div>
+      </div>
+    </div>
+
     <div class="project-card" onclick="location.href='project-soil.html'">
       <div class="card-visual"><div class="card-visual-bg card-v1"></div><div class="card-circuit"></div><div class="card-icon" style="color:#4f9cf9;">🌱</div><span class="card-status status-active">Active</span></div>
       <div class="card-body"><div class="card-tags"><span class="tag">C</span><span class="tag">Modbus-RTU</span><span class="tag">RS-485</span><span class="tag">Arduino</span></div><div class="card-title">Advanced Soil Sensor System</div><div class="card-desc">Multi-node RS-485 bus polling an NPK sensor via Modbus-RTU, streaming calibrated live readings to an LCD. 88.9% validated accuracy against certified references.</div><div class="card-arrow">View Project →</div></div>
