@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Esteban Zamora — BioMIID Data Acquisition System</title>
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="project-detail.css">
+</head>
+<body>
+<div class="bg-art"><div class="orb orb-1"></div><div class="orb orb-2"></div><div class="orb orb-3"></div></div>
+<div class="progress-bar" id="progressBar"></div>
+
+<nav>
+  <a class="nav-logo" href="index.html">EZ.DEV</a>
+  <div class="nav-links">
+    <a href="about.html">About</a>
+    <a href="index.html" class="active">Work</a>
+    <a href="resume.pdf" target="_blank">Résumé</a>
+    <a href="https://github.com/esteban-zamora" target="_blank" class="nav-cta">GitHub ↗</a>
+  </div>
+</nav>
+
+<div class="detail-hero">
+  <div class="detail-hero-bg" style="background:linear-gradient(135deg,#04111e 0%,#071a2e 50%,#04161a 100%);">
+    <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:140px;opacity:0.15;filter:drop-shadow(0 0 80px #4f9cf9);">🔬</div>
+    <div style="position:absolute;inset:0;opacity:0.05;background-image:linear-gradient(rgba(255,255,255,.5)1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.5)1px,transparent 1px);background-size:48px 48px;"></div>
+  </div>
+  <div class="detail-hero-overlay"></div>
+  <a class="detail-back" href="index.html">← All Projects</a>
+  <div class="detail-hero-content">
+    <div class="detail-eyebrow">Jan 2026 – Present · Active · BioMIID Lab, Vanderbilt University</div>
+    <h1 class="detail-title">Live-Cell Microscopy<br>Data Acquisition System</h1>
+    <div class="detail-tags">
+      <span class="detail-tag">C</span>
+      <span class="detail-tag">Arduino Mega</span>
+      <span class="detail-tag">I²C / TWI</span>
+      <span class="detail-tag">AD5669 16-bit DAC</span>
+      <span class="detail-tag">NI PCIe-6353</span>
+      <span class="detail-tag">NI-DAQmx</span>
+      <span class="detail-tag">NIS-Elements 6.20</span>
+      <span class="detail-tag">TTL Triggering</span>
+    </div>
+  </div>
+</div>
+
+<div class="detail-body">
+
+  <div class="detail-grid">
+    <div class="detail-section full ab">
+      <div class="slabel">◎ Overview</div>
+      <p class="stext" style="font-size:16px;line-height:1.9;">
+        A precision real-time data acquisition system developed for Vanderbilt University's BioMIID Lab, supporting live-cell microscopy research. The system acquires environmental data from four sensors — temperature, pH, humidity, and volumetric water content — via I²C on an Arduino Mega, encodes each reading into a calibrated analog voltage through a 16-bit AD5669 DAC, and routes those signals into a National Instruments PCIe-6353 DAQ card for real-time display in a NIS-Elements 6.20 GUI with live time-series plots. The full signal chain was validated through structured integration testing, oscilloscope verification, and systematic fault isolation across firmware, hardware, and software layers.
+      </p>
+    </div>
+  </div>
+
+  <div style="margin-top:2px;" class="detail-grid">
+    <div class="detail-section ab2">
+      <div class="slabel">⊙ System Objective</div>
+      <p class="stext">Provide lab researchers with a real-time, calibrated, multi-sensor environmental monitoring pipeline that integrates seamlessly into the existing NIS-Elements microscopy workflow — zero manual data recording, live visualization, and hardware-verified signal accuracy.</p>
+    </div>
+    <div class="detail-section">
+      <div class="slabel">⊘ Design Constraints</div>
+      <div class="spec-list">
+        <div class="spec-item">All four sensors must share a single I²C bus on the Arduino Mega; address conflicts must be resolved at the firmware layer</div>
+        <div class="spec-item">AD5669 DAC output voltage must correspond exactly to the physical sensor range; encoding/decoding equations must be symmetric and verified against multimeter measurements</div>
+        <div class="spec-item">NI-DAQmx analog input channel assignments must match DAC output port wiring exactly — channel mismatch causes silent measurement errors</div>
+        <div class="spec-item">TTL pulse timing on digital I/O port 2 must align with NIS-Elements trigger expectations to synchronize acquisition with microscopy events</div>
+        <div class="spec-item">Safety timeout mechanism must not interfere with valid data transmission — must be removed or redesigned if it causes false-positive data corruption flags</div>
+      </div>
+    </div>
+  </div>
+
+  <div style="margin-top:2px;">
+    <div class="detail-section full">
+      <div class="slabel">⊞ System Architecture</div>
+      <div class="arch-diagram">┌───────────────────────────────────────────────────────────────────────┐
+│            BIOMIID DATA ACQUISITION SYSTEM ARCHITECTURE               │
+├───────────────────────────────────────────────────────────────────────┤
+│                                                                       │
+│  SENSING LAYER (I²C Bus)                                              │
+│   [Atlas pH Sensor]        ──I²C──►                                   │
+│   [Atlas Temperature RTD]  ──I²C──►  [Arduino Mega]                  │
+│   [Atlas Humidity]         ──I²C──►      │                           │
+│   [TEROS 10 (VWC)]         ──Analog──►   │  Firmware (C)             │
+│                                          │  ├─ I²C polling loop      │
+│  CONVERSION LAYER                        │  ├─ Sensor scaling        │
+│   [Arduino Mega]  ──SPI──►  [AD5669 DAC 16-bit]                      │
+│                                 │   VB → Temperature                  │
+│                                 │   VD → pH                          │
+│                                 │   VF → Humidity                    │
+│                                 │   VH → VWC                         │
+│                                                                       │
+│  ACQUISITION LAYER                                                    │
+│   [AD5669 DAC] ──BNC──► [NI PCIe-6353 DAQ]                           │
+│   [Arduino D2] ──TTL──► [NI PCIe-6353 TTL_Atlas trigger]             │
+│                              │                                        │
+│  VISUALIZATION LAYER         │                                        │
+│   [NI PCIe-6353] ──NI-DAQmx──► [NIS-Elements 6.20 GUI]               │
+│                               Live time-series plots per channel      │
+│                               Calibrated analog input channels        │
+│                               Custom decoding equations               │
+│                                                                       │
+└───────────────────────────────────────────────────────────────────────┘</div>
+    </div>
+  </div>
+
+  <div style="margin-top:2px;" class="detail-grid">
+    <div class="detail-section ab3">
+      <div class="slabel">⊛ Firmware Architecture</div>
+      <p class="stext">The Arduino Mega firmware operates a continuous I²C polling loop across four sensor addresses. For each sensor, the raw reading is acquired, scaled to a voltage within the DAC's 0–5 V output range using a pre-characterized linear equation (e.g., temperature mapped −20 °C to 120 °C → 0 V to 5 V), and written to the corresponding AD5669 channel via SPI. A diagnostic mode was added that prints raw sensor values, expected DAC voltages, and measured DAC voltages to the serial monitor simultaneously, enabling direct comparison during validation. The TEROS 10 volumetric water content sensor is powered via a relay triggered by Arduino GPIO, activated only during the measurement window to prevent continuous power draw. A TTL pulse is sent on digital I/O port 2 to synchronize the NIS-Elements acquisition trigger with each sensor polling cycle.</p>
+    </div>
+    <div class="detail-section abg">
+      <div class="slabel">◈ Determinism &amp; Hard Real-Time Guarantees</div>
+      <p class="stext">The polling loop executes at a fixed cadence with no OS preemption. Each I²C transaction has a bounded worst-case duration determined by the sensor's response time and the bus clock rate. DAC SPI writes complete in a deterministic number of clock cycles. The TTL trigger pulse width is enforced by a NOP-calibrated delay to meet NIS-Elements timing requirements. The original safety-timeout mechanism that forced DAC output to 0 V after 2 seconds was identified as a source of false data corruption flags and removed — its behavior was non-deterministic relative to valid sensor polling cycles. Channel-to-port assignments are hardcoded and verified against the NI-DAQmx configuration, eliminating runtime channel resolution.</p>
+    </div>
+  </div>
+
+  <!-- Fault Log -->
+  <div style="margin-top:2px;">
+    <div class="detail-section full">
+      <div class="slabel">🔍 Fault Isolation Log — Real Engineering, Real Bugs</div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:2px;margin-top:16px;">
+
+        <div style="padding:24px;background:var(--bg);border:1px solid var(--border);border-top:2px solid #ef4444;">
+          <div style="font-family:var(--font-mono);font-size:10px;color:#ef4444;letter-spacing:0.1em;margin-bottom:10px;">BUG #1 · FIRMWARE</div>
+          <div style="font-size:13px;font-weight:400;color:var(--text);margin-bottom:8px;">Safety Timeout Corrupting Valid Data</div>
+          <div style="font-size:13px;font-weight:300;color:var(--text-muted);line-height:1.7;">A firmware safety mechanism forced DAC output to 0 V after 2 seconds when data was flagged as potentially corrupted. The flag was incorrectly triggering on valid sensor data, resetting outputs to zero mid-acquisition. Identified by reviewing firmware line-by-line against expected NI-DAQ readings. Removed the timeout — NI-DAQ immediately began displaying correct values.</div>
+        </div>
+
+        <div style="padding:24px;background:var(--bg);border:1px solid var(--border);border-top:2px solid #f4a261;">
+          <div style="font-family:var(--font-mono);font-size:10px;color:#f4a261;letter-spacing:0.1em;margin-bottom:10px;">BUG #2 · HARDWARE</div>
+          <div style="font-size:13px;font-weight:400;color:var(--text);margin-bottom:8px;">DAC Internal Reference Causing 1.5× Voltage Gain</div>
+          <div style="font-size:13px;font-weight:300;color:var(--text-muted);line-height:1.7;">Measured DAC output voltages were consistently ~1.5× higher than expected. Isolated by commanding the DAC to output known fixed voltages and measuring with a multimeter directly at the output pins, ruling out cable/connector faults. Traced to an internal reference enable bit in the firmware that overrode the intended 5 V external reference. Removed the configuration line; DAC voltages matched expected values within &lt;2% error.</div>
+        </div>
+
+        <div style="padding:24px;background:var(--bg);border:1px solid var(--border);border-top:2px solid var(--accent2);">
+          <div style="font-family:var(--font-mono);font-size:10px;color:var(--accent2);letter-spacing:0.1em;margin-bottom:10px;">BUG #3 · HARDWARE</div>
+          <div style="font-size:13px;font-weight:400;color:var(--text);margin-bottom:8px;">RTD Probe Shield Blocking Thermal Response</div>
+          <div style="font-size:13px;font-weight:300;color:var(--text-muted);line-height:1.7;">Temperature sensor read a constant value regardless of environment. Firmware and electrical connections were verified correct. Physical inspection of the RTD probe revealed an improperly installed protective shield blocking thermal contact. Removing the shield immediately restored correct temperature response, verified against a reference thermometer.</div>
+        </div>
+
+        <div style="padding:24px;background:var(--bg);border:1px solid var(--border);border-top:2px solid var(--accent);">
+          <div style="font-family:var(--font-mono);font-size:10px;color:var(--accent);letter-spacing:0.1em;margin-bottom:10px;">BUG #4 · NI-DAQ</div>
+          <div style="font-size:13px;font-weight:400;color:var(--text);margin-bottom:8px;">Channel Mismatch: AI14 → AI15</div>
+          <div style="font-size:13px;font-weight:300;color:var(--text-muted);line-height:1.7;">NI-DAQ displayed temperature values such as −19 °C or −20 °C despite correct firmware output. Suspected channel assignment error. Switching the NI-DAQmx input from AI14 to AI15 immediately resolved the discrepancy — values matched sensor readings. Confirmed by oscilloscope trace on the correct channel.</div>
+        </div>
+
+        <div style="padding:24px;background:var(--bg);border:1px solid var(--border);border-top:2px solid #c9a84c;">
+          <div style="font-family:var(--font-mono);font-size:10px;color:#c9a84c;letter-spacing:0.1em;margin-bottom:10px;">BUG #5 · SCALING</div>
+          <div style="font-size:13px;font-weight:400;color:var(--text);margin-bottom:8px;">Unit Mismatch: °F Firmware vs °C NI-DAQ</div>
+          <div style="font-size:13px;font-weight:300;color:var(--text-muted);line-height:1.7;">NI-DAQ temperature display was offset from expected values due to a unit mismatch — firmware encoded in °F while NI-DAQ decoded in °C. Resolved by recalibrating the sensor output to °C and updating both the firmware scaling equation and the NI-DAQ decoding equation to match, ensuring encoding/decoding symmetry across the full signal chain.</div>
+        </div>
+
+        <div style="padding:24px;background:var(--bg);border:1px solid var(--border);border-top:2px solid #a78bfa;">
+          <div style="font-family:var(--font-mono);font-size:10px;color:#a78bfa;letter-spacing:0.1em;margin-bottom:10px;">VALIDATION · SYSTEM TEST</div>
+          <div style="font-size:13px;font-weight:400;color:var(--text);margin-bottom:8px;">Full System Integration Test Passed</div>
+          <div style="font-size:13px;font-weight:300;color:var(--text-muted);line-height:1.7;">Final validation: plant mounted on Smartpot with all four sensors active. Perturbed temperature (hot/cold water) and VWC (soil moisture changes) while monitoring serial monitor and NIS-Elements GUI simultaneously. All sensors responded correctly to perturbations. VWC readings consistent with expected ~40 m³/m³ for potted soil. System confirmed operational for live-cell microscopy research use.</div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <div style="margin-top:2px;">
+    <div class="detail-section full">
+      <div class="slabel">◑ Key Metrics</div>
+      <div class="metric-grid">
+        <div class="metric-card">
+          <div class="metric-val">4</div>
+          <div class="metric-unit">sensors</div>
+          <div class="metric-desc">Temp · pH · Humidity · VWC on single I²C bus</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-val">16</div>
+          <div class="metric-unit">bit DAC</div>
+          <div class="metric-desc">AD5669 resolution — 65,536 voltage levels per channel</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-val">5</div>
+          <div class="metric-unit">bugs isolated</div>
+          <div class="metric-desc">Firmware · Hardware · NI-DAQ · Scaling faults resolved</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+window.addEventListener('scroll',()=>{
+  const p=document.getElementById('progressBar');
+  p.style.width=Math.min((window.scrollY/(document.body.scrollHeight-window.innerHeight))*100,100)+'%';
+});
+</script>
+</body>
+</html>
