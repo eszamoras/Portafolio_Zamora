@@ -57,14 +57,13 @@
       <!-- Video full width + callouts below -->
       <div style="display:flex;flex-direction:column;gap:24px;">
 
-        <!-- Video container - landscape 16:9 -->
-        <div style="position:relative;">
-          <!-- Accent corner marks -->
-          <div style="position:absolute;top:-8px;left:-8px;width:24px;height:24px;border-top:2px solid var(--accent);border-left:2px solid var(--accent);z-index:3;"></div>
-          <div style="position:absolute;top:-8px;right:-8px;width:24px;height:24px;border-top:2px solid var(--accent);border-right:2px solid var(--accent);z-index:3;"></div>
-          <div style="position:absolute;bottom:-8px;left:-8px;width:24px;height:24px;border-bottom:2px solid var(--accent);border-left:2px solid var(--accent);z-index:3;"></div>
-          <div style="position:absolute;bottom:-8px;right:-8px;width:24px;height:24px;border-bottom:2px solid var(--accent);border-right:2px solid var(--accent);z-index:3;"></div>
-
+        <!-- Full-width horizontal video -->
+        <div style="position:relative; width:100%; margin-bottom:4px;">
+          <!-- Corner brackets -->
+          <div style="position:absolute;top:0;left:0;width:24px;height:24px;border-top:2px solid var(--accent);border-left:2px solid var(--accent);z-index:3;"></div>
+          <div style="position:absolute;top:0;right:0;width:24px;height:24px;border-top:2px solid var(--accent);border-right:2px solid var(--accent);z-index:3;"></div>
+          <div style="position:absolute;bottom:0;left:0;width:24px;height:24px;border-bottom:2px solid var(--accent);border-left:2px solid var(--accent);z-index:3;"></div>
+          <div style="position:absolute;bottom:0;right:0;width:24px;height:24px;border-bottom:2px solid var(--accent);border-right:2px solid var(--accent);z-index:3;"></div>
           <video
             autoplay
             loop
@@ -72,17 +71,17 @@
             playsinline
             style="
               width: 100%;
-              aspect-ratio: 16/9;
+              aspect-ratio: 1080/632;
               display: block;
               border-radius: 2px;
-              background: #000;
+              background: #0d1f3c;
             "
           >
             <source src="mazesolver.mp4" type="video/mp4">
           </video>
         </div>
 
-        <!-- Callout cards below video -->
+        <!-- Callout cards in a row below -->
         <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:2px;">
 
           <div style="padding:20px 24px;background:var(--bg);border:1px solid var(--border);border-left:3px solid var(--accent);">
@@ -108,7 +107,7 @@
             <div style="font-size:14px;font-weight:400;color:var(--text);margin-bottom:6px;">OLED Live Output</div>
             <div style="font-size:13px;font-weight:300;color:var(--text-muted);line-height:1.65;">Sensor states, intersection classifications, and the evolving path array are streamed to the integrated OLED display in real time, enabling firmware fault isolation without a debugger.</div>
           </div>
-        </div>
+        </div><!-- end callouts grid -->
       </div>
     </div>
   </div>
