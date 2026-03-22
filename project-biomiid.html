@@ -75,34 +75,46 @@
   <div style="margin-top:2px;">
     <div class="detail-section full">
       <div class="slabel">⊞ System Architecture</div>
-      <div class="arch-diagram">┌───────────────────────────────────────────────────────────────────────┐
-│            BIOMIID DATA ACQUISITION SYSTEM ARCHITECTURE               │
-├───────────────────────────────────────────────────────────────────────┤
-│                                                                       │
-│  SENSING LAYER (I²C Bus)                                              │
-│   [Atlas pH Sensor]        ──I²C──►                                   │
-│   [Atlas Temperature RTD]  ──I²C──►  [Arduino Mega]                  │
-│   [Atlas Humidity]         ──I²C──►      │                           │
-│   [TEROS 10 (VWC)]         ──Analog──►   │  Firmware (C)             │
-│                                          │  ├─ I²C polling loop      │
-│  CONVERSION LAYER                        │  ├─ Sensor scaling        │
-│   [Arduino Mega]  ──SPI──►  [AD5669 DAC 16-bit]                      │
-│                                 │   VB → Temperature                  │
-│                                 │   VD → pH                          │
-│                                 │   VF → Humidity                    │
-│                                 │   VH → VWC                         │
-│                                                                       │
-│  ACQUISITION LAYER                                                    │
-│   [AD5669 DAC] ──BNC──► [NI PCIe-6353 DAQ]                           │
-│   [Arduino D2] ──TTL──► [NI PCIe-6353 TTL_Atlas trigger]             │
-│                              │                                        │
-│  VISUALIZATION LAYER         │                                        │
-│   [NI PCIe-6353] ──NI-DAQmx──► [NIS-Elements 6.20 GUI]               │
-│                               Live time-series plots per channel      │
-│                               Calibrated analog input channels        │
-│                               Custom decoding equations               │
-│                                                                       │
-└───────────────────────────────────────────────────────────────────────┘</div>
+      <div style="
+        margin-top: 20px;
+        background: var(--bg);
+        border: 1px solid var(--border);
+        border-radius: 2px;
+        overflow: hidden;
+      ">
+        <div style="background:#f8f9fa; padding: 32px 40px;">
+          <img
+            src="architecture.jpg"
+            alt="BioMIID System Architecture Diagram"
+            style="
+              display: block;
+              width: 100%;
+              max-width: 961px;
+              height: auto;
+              aspect-ratio: 961 / 473;
+              margin: 0 auto;
+            "
+          >
+        </div>
+        <div style="
+          padding: 14px 24px;
+          border-top: 1px solid var(--border);
+          display: flex; align-items: center;
+          justify-content: space-between;
+          flex-wrap: wrap; gap: 12px;
+        ">
+          <div style="font-family:var(--font-mono);font-size:11px;color:var(--text-muted);letter-spacing:0.08em;">
+            Full signal chain: Sensors → Arduino Mega → AD5669 DAC → NI PCIe-6353 → NIS-Elements GUI
+          </div>
+          <div style="display:flex;gap:16px;flex-wrap:wrap;">
+            <span style="font-family:var(--font-mono);font-size:10px;color:var(--accent);letter-spacing:0.1em;">① NIDAQ</span>
+            <span style="font-family:var(--font-mono);font-size:10px;color:var(--accent2);letter-spacing:0.1em;">② Power Rails</span>
+            <span style="font-family:var(--font-mono);font-size:10px;color:var(--accent3);letter-spacing:0.1em;">③ I²C / Analog</span>
+            <span style="font-family:var(--font-mono);font-size:10px;color:#a78bfa;letter-spacing:0.1em;">④ DAC Output</span>
+            <span style="font-family:var(--font-mono);font-size:10px;color:var(--gold);letter-spacing:0.1em;">⑤ Relay</span>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 
