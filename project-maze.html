@@ -49,33 +49,105 @@
       <div class="spec-list"><div class="spec-item">All firmware must execute on the ATmega32U4 at 16 MHz with no OS; all timing must be software-managed</div><div class="spec-item">PID loop must run fast enough to maintain line tracking at navigating speeds without CPU saturation</div><div class="spec-item">FSM must resolve ambiguous intersections (straight-or-right, straight-or-left) using inch-forward sensing</div><div class="spec-item">Path array is statically allocated — buffer overflow must be prevented at compile time</div><div class="spec-item">Path-reduction algorithm must handle all three-step patterns (L-U-L, L-U-S, L-U-R, S-U-S) in multi-pass</div></div>
     </div>
   </div>
+  <!-- VIDEO SECTION -->
   <div style="margin-top:2px;">
-    <div class="detail-section full">
-      <div class="slabel">⊞ System Architecture</div>
-      <div class="arch-diagram">┌─────────────────────────────────────────────────────────┐
-│           MAZE ROBOT SYSTEM ARCHITECTURE                 │
-├─────────────────────────────────────────────────────────┤
-│                                                          │
-│  SENSING LAYER                                           │
-│   <span class="ah">[5-Element Reflectance Array]</span>  <span class="ah2">──►</span>  line_sensors.h    │
-│                                                          │
-│  CONTROL LAYER                                           │
-│   Sensor Data <span class="ah2">──►</span> <span class="ah">[PID Controller]</span> <span class="ah2">──►</span> Motor Speeds     │
-│                   Kp=32 Kd=128 Ki=0                      │
-│                                                          │
-│  DECISION LAYER                                          │
-│   Sensor Pattern <span class="ah2">──►</span> <span class="ah">[Intersection FSM]</span>                  │
-│                       ├─ Inch Forward (ambiguity resolve)│
-│                       ├─ Left-Hand Rule Priority         │
-│                       └─ L / R / S / U → Path Array     │
-│                                                          │
-│  OPTIMIZATION LAYER                                      │
-│   Path Array <span class="ah2">──►</span> <span class="ah">[simplify_path()]</span> <span class="ah2">──►</span> Optimal Route    │
-│                                                          │
-│  OUTPUT                                                  │
-│   Motor Drivers + <span class="ah">[OLED Debug Display]</span>                   │
-│                                                          │
-└─────────────────────────────────────────────────────────┘</div>
+    <div class="detail-section full" style="padding:40px;">
+      <div class="slabel">▶ Robot in Action</div>
+
+      <div style="
+        display: grid;
+        grid-template-columns: auto 1fr;
+        gap: 48px;
+        align-items: center;
+      ">
+        <!-- Vertical video container -->
+        <div style="
+          position: relative;
+          width: 280px;
+          flex-shrink: 0;
+        ">
+          <!-- Decorative frame -->
+          <div style="
+            position: absolute;
+            inset: -8px;
+            border: 1px solid var(--border-hover);
+            border-radius: 4px;
+            pointer-events: none;
+            z-index: 2;
+          "></div>
+          <!-- Accent corner marks -->
+          <div style="position:absolute;top:-8px;left:-8px;width:20px;height:20px;border-top:2px solid var(--accent);border-left:2px solid var(--accent);border-radius:2px 0 0 0;z-index:3;"></div>
+          <div style="position:absolute;top:-8px;right:-8px;width:20px;height:20px;border-top:2px solid var(--accent);border-right:2px solid var(--accent);border-radius:0 2px 0 0;z-index:3;"></div>
+          <div style="position:absolute;bottom:-8px;left:-8px;width:20px;height:20px;border-bottom:2px solid var(--accent);border-left:2px solid var(--accent);border-radius:0 0 0 2px;z-index:3;"></div>
+          <div style="position:absolute;bottom:-8px;right:-8px;width:20px;height:20px;border-bottom:2px solid var(--accent);border-right:2px solid var(--accent);border-radius:0 0 2px 0;z-index:3;"></div>
+
+          <video
+            autoplay
+            loop
+            muted
+            playsinline
+            style="
+              width: 280px;
+              height: 500px;
+              object-fit: cover;
+              object-position: center;
+              display: block;
+              border-radius: 2px;
+            "
+          >
+            <source src="mazesolver.mp4" type="video/mp4">
+          </video>
+
+          <!-- Loop badge -->
+          <div style="
+            position: absolute;
+            bottom: 14px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 4;
+            font-family: var(--font-mono);
+            font-size: 10px;
+            letter-spacing: 0.12em;
+            color: var(--text-muted);
+            background: rgba(8,10,14,0.75);
+            backdrop-filter: blur(8px);
+            border: 1px solid var(--border-hover);
+            padding: 5px 12px;
+            border-radius: 2px;
+            white-space: nowrap;
+            text-transform: uppercase;
+          ">⟳ &nbsp;Looping</div>
+        </div>
+
+        <!-- Side callouts -->
+        <div style="display:flex;flex-direction:column;gap:16px;">
+
+          <div style="padding:20px 24px;background:var(--bg);border:1px solid var(--border);border-left:3px solid var(--accent);">
+            <div style="font-family:var(--font-mono);font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:var(--text-muted);margin-bottom:8px;">Control Loop</div>
+            <div style="font-size:14px;font-weight:400;color:var(--text);margin-bottom:6px;">PID Line-Following</div>
+            <div style="font-size:13px;font-weight:300;color:var(--text-muted);line-height:1.65;">Proportional-Integral-Derivative controller computes differential motor corrections in real time. Kp=32, Kd=128, Ki=0 — tuned via hardware-in-the-loop iteration.</div>
+          </div>
+
+          <div style="padding:20px 24px;background:var(--bg);border:1px solid var(--border);border-left:3px solid var(--accent2);">
+            <div style="font-family:var(--font-mono);font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:var(--text-muted);margin-bottom:8px;">Decision Logic</div>
+            <div style="font-size:14px;font-weight:400;color:var(--text);margin-bottom:6px;">Left-Hand Rule FSM</div>
+            <div style="font-size:13px;font-weight:300;color:var(--text-muted);line-height:1.65;">Finite State Machine classifies each intersection as L, R, S, or U using the inch-forward technique to resolve ambiguous sensor patterns before committing to a turn.</div>
+          </div>
+
+          <div style="padding:20px 24px;background:var(--bg);border:1px solid var(--border);border-left:3px solid var(--accent3);">
+            <div style="font-family:var(--font-mono);font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:var(--text-muted);margin-bottom:8px;">Path Optimization</div>
+            <div style="font-size:14px;font-weight:400;color:var(--text);margin-bottom:6px;">Multi-Pass Reduction</div>
+            <div style="font-size:13px;font-weight:300;color:var(--text-muted);line-height:1.65;">After the first exploratory run, the recorded decision sequence is reduced in multiple passes (L-U-L → S, etc.) to compute the shortest route executed on the second run.</div>
+          </div>
+
+          <div style="padding:20px 24px;background:var(--bg);border:1px solid var(--border);border-left:3px solid var(--gold);">
+            <div style="font-family:var(--font-mono);font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:var(--text-muted);margin-bottom:8px;">Debug Tooling</div>
+            <div style="font-size:14px;font-weight:400;color:var(--text);margin-bottom:6px;">OLED Live Output</div>
+            <div style="font-size:13px;font-weight:300;color:var(--text-muted);line-height:1.65;">Sensor states, intersection classifications, and the evolving path array are streamed to the integrated OLED display in real time, enabling firmware fault isolation without a debugger.</div>
+          </div>
+
+        </div>
+      </div>
     </div>
   </div>
   <div style="margin-top:2px;" class="detail-grid">
